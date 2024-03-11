@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Forecast Challenge</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Discover your weather forecast</h1>
+        <div class="input-container">
+            <input type="text" id="cityValue" placeholder="Enter city name">
+        </div>
+        
+        <div class="button-container">
+            <button class="button" onclick="getWeather()">Go</button>
+            <button class="button button-clear" onclick="clearWeather()">Clear</button>
+        </div>
+        <div id="weatherDisplay" class="forecast-container"></div>
+    </div>
+
+    <script>
+        async function getWeather() {
+            const city = document.getElementById('cityValue').value;
+            if (!city) {
+                alert("Enter a city name.");
+                return;
+            }
+
+            try {
+                const response = await fetch(`/weather?city=${city}`);
+                const data = await response.json();
+
+                let forecastHTML = `<h3>Weather forecast for ${city}</h3>`;
+                if (data.length === 0) {
+                    forecastHTML += `<p>No forecast available for ${city}</p>`;
+                } else {
+                    forecastHTML += '<table class="forecast-table">';
+                    forecastHTML += '<tr><th>Date</th><th>Min Temp (°C)</th><th>Max Temp (°C)</th></tr>';
+                    data.forEach(entry => {
+                        forecastHTML += `<tr><td>${entry.date}</td><td>${entry.temperature.min}</td><td>${entry.temperature.max}</td></tr>`;
+                    });
+                    forecastHTML += '</table>';
+                }
+
+                document.getElementById('weatherDisplay').innerHTML = forecastHTML;
+            } catch (error) {
+                console.error(error);
+                alert("Error fetching weather data.");
+            }
+        }
+
+        function clearWeather() {
+            document.getElementById('weatherDisplay').innerHTML = '';
+            document.getElementById('cityValue').value = '';
+        }
+    </script>
+</body>
+</html>
